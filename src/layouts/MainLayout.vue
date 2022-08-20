@@ -1,116 +1,88 @@
 <template>
-  <q-layout view="lHh Lpr lFf">
-    <q-header elevated>
+  <q-layout view="hHh LpR fFf">
+    <q-header bordered class="bg-primary text-white" height-hint="98">
       <q-toolbar>
-        <q-btn
-          flat
-          dense
-          round
-          icon="menu"
-          aria-label="Menu"
-          @click="toggleLeftDrawer"
-        />
+        <q-btn dense flat round icon="menu" @click="toggleLeftDrawer" />
 
         <q-toolbar-title>
-          Quasar App
+          <q-avatar>
+            <img src="https://cdn.quasar.dev/logo-v2/svg/logo-mono-white.svg" />
+          </q-avatar>
+          {{ title }}
         </q-toolbar-title>
-
-        <div>Quasar v{{ $q.version }}</div>
+        <q-space></q-space>
+        <selectedDevice />
+        <q-toggle
+          dark
+          v-model="dark"
+          @update:model-value="darkMode(dark)"
+          color="dark"
+          icon="dark_mode"
+        ></q-toggle>
       </q-toolbar>
+
+      <q-tabs align="center">
+        <q-route-tab to="/Music" label="Music Library" />
+        <q-route-tab to="/Sounds" label="Sounds Library" />
+      </q-tabs>
     </q-header>
 
-    <q-drawer
-      v-model="leftDrawerOpen"
-      show-if-above
-      bordered
-    >
-      <q-list>
-        <q-item-label
-          header
-        >
-          Essential Links
-        </q-item-label>
-
-        <EssentialLink
-          v-for="link in essentialLinks"
-          :key="link.title"
-          v-bind="link"
-        />
-      </q-list>
+    <q-drawer show-if-above v-model="leftDrawerOpen" side="left" bordered>
+      <!-- drawer content -->
     </q-drawer>
 
     <q-page-container>
       <router-view />
     </q-page-container>
+    <q-footer elevated class="bg-grey-8 text-white">
+      <q-toolbar>
+        <q-toolbar-title>
+          <MusicPlayer />
+        </q-toolbar-title>
+      </q-toolbar>
+    </q-footer>
   </q-layout>
 </template>
 
 <script lang="ts">
-import { defineComponent, ref } from 'vue';
-import EssentialLink from 'components/EssentialLink.vue';
+import { provide, ref } from 'vue';
+import { useQuasar } from 'quasar';
+import SelectedDevice from 'src/components/SelectDevice.vue';
+import MusicPlayer from 'src/components/MusicPlayer.vue';
 
-const linksList = [
-  {
-    title: 'Docs',
-    caption: 'quasar.dev',
-    icon: 'school',
-    link: 'https://quasar.dev'
-  },
-  {
-    title: 'Github',
-    caption: 'github.com/quasarframework',
-    icon: 'code',
-    link: 'https://github.com/quasarframework'
-  },
-  {
-    title: 'Discord Chat Channel',
-    caption: 'chat.quasar.dev',
-    icon: 'chat',
-    link: 'https://chat.quasar.dev'
-  },
-  {
-    title: 'Forum',
-    caption: 'forum.quasar.dev',
-    icon: 'record_voice_over',
-    link: 'https://forum.quasar.dev'
-  },
-  {
-    title: 'Twitter',
-    caption: '@quasarframework',
-    icon: 'rss_feed',
-    link: 'https://twitter.quasar.dev'
-  },
-  {
-    title: 'Facebook',
-    caption: '@QuasarFramework',
-    icon: 'public',
-    link: 'https://facebook.quasar.dev'
-  },
-  {
-    title: 'Quasar Awesome',
-    caption: 'Community Quasar projects',
-    icon: 'favorite',
-    link: 'https://awesome.quasar.dev'
-  }
-];
+export interface HTMLMediaSink extends HTMLMediaElement {
+  setSinkId(id: string): void;
+}
 
-export default defineComponent({
-  name: 'MainLayout',
-
-  components: {
-    EssentialLink
-  },
-
-  setup () {
-    const leftDrawerOpen = ref(false)
+export default {
+  components: { SelectedDevice, MusicPlayer },
+  setup() {
+    const title = ref('aaaaaaa');
+    const selectedDevice = ref('');
+    const selectedSong = ref<{ _id: string; change: number }>({
+      _id: '',
+      change: 0,
+    });
+    provide('selectedDevice', selectedDevice);
+    provide('selectSong', selectedSong);
+    const leftDrawerOpen = ref(false);
+    const dark = ref(true);
+    const $q = useQuasar();
+    $q.dark.set(dark.value);
+    const darkMode = (dark: boolean) => {
+      console.log(dark);
+      $q.dark.set(dark);
+    };
 
     return {
-      essentialLinks: linksList,
+      dark,
+      title,
       leftDrawerOpen,
-      toggleLeftDrawer () {
-        leftDrawerOpen.value = !leftDrawerOpen.value
-      }
-    }
-  }
-});
+      darkMode,
+      toggleLeftDrawer() {
+        leftDrawerOpen.value = !leftDrawerOpen.value;
+      },
+    };
+  },
+};
 </script>
