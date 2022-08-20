@@ -6,28 +6,31 @@
       v-on:play="musicPlay()"
       src=""
     ></audio>
-    <q-icon
-      v-if="!play"
-      @click="currentPlay()"
-      class="cursor-pointer"
-      size="40px"
-      name="play_circle"
-    ></q-icon>
-    <q-icon
-      v-if="play"
-      @click="stopIt()"
-      class="cursor-pointer"
-      size="40px"
-      name="pause_circle"
-    ></q-icon>
-    <q-slider
-      :min="0"
-      :max="100"
-      v-model="playerSlide"
-      @change="changeBar"
-      @mouseenter="test"
-    >
-    </q-slider>
+    <div class="row justify-center col-12">
+      <q-icon
+        v-if="!play"
+        @click="currentPlay()"
+        class="cursor-pointer"
+        size="40px"
+        name="play_circle"
+      ></q-icon>
+      <q-icon
+        v-if="play"
+        @click="stopIt()"
+        class="cursor-pointer"
+        size="40px"
+        name="pause_circle"
+      ></q-icon>
+    </div>
+    <div class="col-8">
+      <q-slider
+        :min="0"
+        :max="100"
+        v-model="playerSlide"
+        @update:model-value="changeBar"
+      >
+      </q-slider>
+    </div>
   </div>
 </template>
 
@@ -56,8 +59,6 @@ export default {
     const currentPlay = () => {
       if (!audioSource.value) return;
       audioSource.value.currentTime = current.value || 0;
-      console.log(playerSlide.value);
-      audioSource.value?.play();
     };
     const playIt = async () => {
       const song = await db.songs.get(selectSong.value._id);
@@ -91,7 +92,7 @@ export default {
     const musicPlay = () => {
       play.value = true;
     };
-    const changeBar = () => {
+    const changeBar = async () => {
       if (!audioSource.value) return;
       if (!playerSlide.value) return;
       audioSource.value.currentTime = Number(
