@@ -57,7 +57,7 @@ export interface HTMLMediaSink extends HTMLMediaElement {
 export default {
   components: { SelectedDevice, MusicPlayer },
   setup() {
-    const title = ref('aaaaaaa');
+    const title = ref('BardWebPlayer');
     const selectedDevice = ref('');
     const selectedSong = ref<{ _id: string; change: number }>({
       _id: '',
