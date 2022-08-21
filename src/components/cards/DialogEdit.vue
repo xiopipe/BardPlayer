@@ -1,11 +1,6 @@
 <template>
   <!-- notice dialogRef here -->
-  <q-dialog
-    ref="dialogRef"
-    @hide="onDialogHide"
-    persistent
-    @keyup.enter="onOKClick"
-  >
+  <q-dialog ref="dialogRef" @hide="onDialogHide" @keyup.enter="onOKClick">
     <q-card
       class="q-dialog-plugin q-pa-md"
       @dragover.prevent
@@ -53,6 +48,7 @@ export default defineComponent({
   props: {
     loop: Boolean,
     name: String,
+    img: File,
   },
 
   emits: [
@@ -73,10 +69,12 @@ export default defineComponent({
     // onDialogCancel - Function to call to settle dialog with "cancel" outcome
     const uploader = ref<HTMLElement>();
     const url = ref<string>();
-
-    // info to upload
+    if (!!props.img) {
+      url.value = URL.createObjectURL(props.img);
+    }
     const loopBool = ref(props.loop);
     const nameCard = ref(props.name);
+
     const file = ref<File>();
 
     const upImage = () => {
@@ -116,7 +114,7 @@ export default defineComponent({
         onDialogOK({
           loop: loopBool.value,
           title: nameCard.value,
-          img: file.value,
+          img: file.value || props.img,
         });
         // or with payload: onDialogOK({ ... })
         // ...and it will also hide the dialog automatically

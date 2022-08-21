@@ -44,6 +44,14 @@
   </div>
 </template>
 
+<style lang="scss">
+.darkent {
+  background-repeat: no-repeat;
+  background-size: cover;
+  background-position: center;
+}
+</style>
+
 <script setup lang="ts">
 import { useQuasar } from 'quasar';
 import Songs from 'src/stores/indexed/songs';
@@ -86,6 +94,7 @@ const dialogEditCard = () => {
     componentProps: {
       name: Props.title,
       loop: Props.loop,
+      img: Props.img,
     },
   }).onOk(async (element) => {
     console.log(element);
