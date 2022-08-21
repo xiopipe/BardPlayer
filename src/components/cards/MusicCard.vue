@@ -8,13 +8,13 @@
               <q-item-section avatar>
                 <q-icon name="tune"> </q-icon>
               </q-item-section>
-              <q-item-section> Editar </q-item-section>
+              <q-item-section> Edit </q-item-section>
             </q-item>
             <q-item clickable v-ripple v-close-popup>
               <q-item-section avatar>
                 <q-icon name="image"></q-icon>
               </q-item-section>
-              <q-item-section> Subir Imagen </q-item-section>
+              <q-item-section> Upload Image </q-item-section>
             </q-item>
           </q-list>
         </div>
@@ -46,9 +46,12 @@
 
 <script setup lang="ts">
 import { useQuasar } from 'quasar';
+import Songs from 'src/stores/indexed/songs';
 import { inject, ref, watch } from 'vue-demi';
 import DialogEdit from './DialogEdit.vue';
+const emit = defineEmits(['EditUpdate']);
 const $q = useQuasar();
+const OSong = new Songs();
 const title = ref();
 const urlImage = ref();
 const disable = ref(true);
@@ -64,8 +67,9 @@ const Props = defineProps({
 
 const props = ref(Props);
 title.value = props.value.title;
-if (!!props.value.img) {
-  urlImage.value = URL.createObjectURL(props.value.img);
+if (!!Props.img) {
+  console.log('entro');
+  urlImage.value = URL.createObjectURL(Props.img);
 }
 const changeSong = (_id: string | undefined) => {
   if (selectSong?.value === undefined) return;
@@ -83,13 +87,17 @@ const dialogEditCard = () => {
       name: Props.title,
       loop: Props.loop,
     },
-  }).onOk((element) => {
+  }).onOk(async (element) => {
     console.log(element);
+    await OSong.data.update(Props._id as string, element);
+    emit('EditUpdate');
   });
 };
 
-watch(title, () => {
-  console.log(title.value, Props._id);
+watch(Props, () => {
+  if (!!Props.img) {
+    urlImage.value = URL.createObjectURL(Props.img);
+  }
 });
 watch(Props, () => {
   title.value = props.value.title;

@@ -62,6 +62,7 @@ export default {
     };
     const playIt = async () => {
       const song = await db.songs.get(selectSong.value._id);
+      document.title = song?.title as string;
       if (song?.file != undefined) {
         const file = song.file;
         if (!file) return;

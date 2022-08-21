@@ -137,8 +137,8 @@ module.exports = configure(function (ctx) {
       // chainWebpackCustomSW (/* chain */) {},
 
       manifest: {
-        name: 'Quasar App',
-        short_name: 'Quasar App',
+        name: 'Bard Player',
+        short_name: 'Bard Player',
         description: '',
         display: 'standalone',
         orientation: 'portrait',

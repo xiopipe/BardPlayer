@@ -10,6 +10,7 @@
       <template #item="{ element }">
         <div>
           <MusicCard
+            @EditUpdate="getDataCard"
             :title="element.title"
             :_id="element._id"
             :img="element.img"
@@ -87,7 +88,7 @@ export default {
       getDataCard();
     });
 
-    return { cards, changeSong, updateItemOrder, title };
+    return { cards, changeSong, updateItemOrder, getDataCard, title };
   },
 };
 </script>

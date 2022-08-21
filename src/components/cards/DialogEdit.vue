@@ -1,7 +1,16 @@
 <template>
   <!-- notice dialogRef here -->
-  <q-dialog ref="dialogRef" @hide="onDialogHide" persistent>
-    <q-card class="q-dialog-plugin q-pa-md">
+  <q-dialog
+    ref="dialogRef"
+    @hide="onDialogHide"
+    persistent
+    @keyup.enter="onOKClick"
+  >
+    <q-card
+      class="q-dialog-plugin q-pa-md"
+      @dragover.prevent
+      @drop.prevent="imageHandlerDrag"
+    >
       <q-input v-model="nameCard" label="name"></q-input>
       <q-toggle v-model="loopBool" left-label label="Loop?"></q-toggle>
 
@@ -79,6 +88,10 @@ export default defineComponent({
       url.value = URL.createObjectURL(target?.files[0]);
       file.value = target?.files[0];
     };
+    const imageHandlerDrag = (event: DragEvent) => {
+      file.value = event.dataTransfer?.files[0];
+      url.value = URL.createObjectURL(file.value as File);
+    };
 
     return {
       loopBool,
@@ -88,6 +101,7 @@ export default defineComponent({
       url,
       upImage,
       imageHandler,
+      imageHandlerDrag,
       // This is REQUIRED;
       // Need to inject these (from useDialogPluginComponent() call)
       // into the vue scope for the vue html template
@@ -100,9 +114,9 @@ export default defineComponent({
         // on OK, it is REQUIRED to
         // call onDialogOK (with optional payload)
         onDialogOK({
-          loopBool: loopBool.value,
-          nameCard: nameCard.value,
-          file: file.value,
+          loop: loopBool.value,
+          title: nameCard.value,
+          img: file.value,
         });
         // or with payload: onDialogOK({ ... })
         // ...and it will also hide the dialog automatically
