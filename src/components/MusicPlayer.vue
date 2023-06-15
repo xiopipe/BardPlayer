@@ -6,35 +6,39 @@
       v-on:play="musicPlay()"
       src=""
     ></audio>
-    <q-icon
-      v-if="!play"
-      @click="currentPlay()"
-      class="cursor-pointer"
-      size="40px"
-      name="play_circle"
-    ></q-icon>
-    <q-icon
-      v-if="play"
-      @click="stopIt()"
-      class="cursor-pointer"
-      size="40px"
-      name="pause_circle"
-    ></q-icon>
-    <q-slider
-      :min="0"
-      :max="100"
-      v-model="playerSlide"
-      @change="changeBar"
-      @mouseenter="test"
-    >
-    </q-slider>
+    <div class="row justify-center col-12">
+      <q-icon
+        v-if="!play"
+        @click="currentPlay()"
+        class="cursor-pointer"
+        size="40px"
+        name="play_circle"
+      ></q-icon>
+      <q-icon
+        v-if="play"
+        @click="stopIt()"
+        class="cursor-pointer"
+        size="40px"
+        name="pause_circle"
+      ></q-icon>
+    </div>
+    <div class="col-8">
+      <q-slider
+        :min="0"
+        :max="100"
+        v-model="playerSlide"
+        :readonly="!playerSlide"
+        @update:model-value="changeBar"
+      >
+      </q-slider>
+    </div>
   </div>
 </template>
 
 <script lang="ts">
 import { inject, onMounted, ref, watch } from 'vue-demi';
 import { ORM } from 'src/stores/indexed';
-import Songs from 'src/stores/indexed/songs';
+import Songs, { ISongs } from 'src/stores/indexed/songs';
 
 export interface HTMLMediaSink extends HTMLMediaElement {
   setSinkId(id: string): void;
@@ -51,24 +55,30 @@ export default {
     const selectSong = inject<{ value: { _id: string; change: number } }>(
       'selectSong'
     );
+    const song = ref<ISongs>();
     if (!selectedDevice) return;
     if (selectSong === undefined) return;
+
     const currentPlay = () => {
       if (!audioSource.value) return;
       audioSource.value.currentTime = current.value || 0;
-      console.log(playerSlide.value);
       audioSource.value?.play();
     };
     const playIt = async () => {
-      const song = await db.songs.get(selectSong.value._id);
-      if (song?.file != undefined) {
-        const file = song.file;
+      song.value = await db.songs.get(selectSong.value._id);
+      document.title = song.value?.title as string;
+      if (song.value?.file != undefined) {
+        const file = song.value.file;
         if (!file) return;
         if (!audioSource.value) return;
         audioSource.value.src = URL.createObjectURL(file);
         audioSource.value.setSinkId(selectedDevice.value);
+
         audioSource.value.loop = true;
         audioSource.value?.play();
+        // if (!!song.value.fadeIn) {
+        //   audioSource.value.volume = 0;
+        // }
       } else {
         const songs = new Songs();
         const song = await songs.data.toArray();
@@ -91,7 +101,7 @@ export default {
     const musicPlay = () => {
       play.value = true;
     };
-    const changeBar = () => {
+    const changeBar = async () => {
       if (!audioSource.value) return;
       if (!playerSlide.value) return;
       audioSource.value.currentTime = Number(
@@ -102,6 +112,10 @@ export default {
     onMounted(() => {
       audioSource.value?.addEventListener('timeupdate', () => {
         if (!audioSource.value) return;
+        if (audioSource.value.currentTime === 0 && !!song.value?.fadeIn) {
+          audioSource.value.volume = 0;
+          console.log('entro');
+        }
         if (!audioSource.value?.duration) return;
         playerSlide.value = Number(
           (
@@ -110,8 +124,35 @@ export default {
           ).toFixed(2)
         );
         current.value = audioSource.value?.currentTime;
+        const fadeOut =
+          audioSource.value.duration - (song.value?.fadeOut as number);
+        if (
+          audioSource.value.currentTime >= fadeOut &&
+          audioSource.value.volume !== 0
+        ) {
+          console.log('entro');
+          try {
+            audioSource.value.volume -= 0.25 / fadeOut;
+          } catch (error) {
+            audioSource.value.volume = 0;
+          }
+        }
+        const fadeIn = song.value?.fadeIn as number;
+        if (
+          audioSource.value.volume < 1 &&
+          audioSource.value.currentTime <= fadeIn + 1
+        ) {
+          const increase = 0.25 / fadeIn;
+          try {
+            audioSource.value.volume += increase;
+          } catch (error) {
+            audioSource.value.volume = 1;
+          }
+          console.log(audioSource.value.currentTime, audioSource.value.volume);
+        }
       });
     });
+
     watch(selectSong.value, async () => {
       void playIt();
       play.value = !play.value;

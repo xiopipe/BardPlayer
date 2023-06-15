@@ -1,9 +1,37 @@
 <template>
   <!-- notice dialogRef here -->
-  <q-dialog ref="dialogRef" @hide="onDialogHide" persistent>
-    <q-card class="q-dialog-plugin q-pa-md">
+  <q-dialog ref="dialogRef" @hide="onDialogHide" @keyup.enter="onOKClick">
+    <q-card
+      class="q-dialog-plugin q-pa-md"
+      @dragover.prevent
+      @drop.prevent="imageHandlerDrag"
+    >
       <q-input v-model="nameCard" label="name"></q-input>
-      <q-toggle v-model="loopBool" left-label label="Loop?"></q-toggle>
+      <div class="row items-center q-my-sm">
+        <q-toggle v-model="loopBool" left-label label="Loop?"></q-toggle>
+        <span class="q-mr-xs">Fade in</span>
+        <q-input
+          v-model="fadeInRef"
+          filled
+          mask="##"
+          maxlength="2"
+          style="width: 11%"
+          class="q-pa-none q-mr-sm"
+          dense
+          borderless
+        ></q-input>
+        <span class="q-mr-xs">Fade out</span>
+        <q-input
+          v-model="fadeOutRef"
+          filled
+          mask="##"
+          maxlength="2"
+          style="width: 11%"
+          class="q-pa-none"
+          dense
+          borderless
+        ></q-input>
+      </div>
 
       <q-img
         @click="upImage"
@@ -44,6 +72,9 @@ export default defineComponent({
   props: {
     loop: Boolean,
     name: String,
+    img: File,
+    fadeOut: Number,
+    fadeIn: Number,
   },
 
   emits: [
@@ -64,10 +95,13 @@ export default defineComponent({
     // onDialogCancel - Function to call to settle dialog with "cancel" outcome
     const uploader = ref<HTMLElement>();
     const url = ref<string>();
-
-    // info to upload
+    if (!!props.img) {
+      url.value = URL.createObjectURL(props.img);
+    }
     const loopBool = ref(props.loop);
     const nameCard = ref(props.name);
+    const fadeInRef = ref<number | undefined>(props.fadeIn);
+    const fadeOutRef = ref<number | undefined>(props.fadeOut);
     const file = ref<File>();
 
     const upImage = () => {
@@ -79,15 +113,22 @@ export default defineComponent({
       url.value = URL.createObjectURL(target?.files[0]);
       file.value = target?.files[0];
     };
+    const imageHandlerDrag = (event: DragEvent) => {
+      file.value = event.dataTransfer?.files[0];
+      url.value = URL.createObjectURL(file.value as File);
+    };
 
     return {
       loopBool,
       uploader,
       nameCard,
+      fadeInRef,
+      fadeOutRef,
 
       url,
       upImage,
       imageHandler,
+      imageHandlerDrag,
       // This is REQUIRED;
       // Need to inject these (from useDialogPluginComponent() call)
       // into the vue scope for the vue html template
@@ -100,9 +141,11 @@ export default defineComponent({
         // on OK, it is REQUIRED to
         // call onDialogOK (with optional payload)
         onDialogOK({
-          loopBool: loopBool.value,
-          nameCard: nameCard.value,
-          file: file.value,
+          loop: loopBool.value,
+          title: nameCard.value,
+          img: file.value || props.img,
+          fadeIn: Number(fadeInRef.value),
+          fadeOut: Number(fadeOutRef.value),
         });
         // or with payload: onDialogOK({ ... })
         // ...and it will also hide the dialog automatically
