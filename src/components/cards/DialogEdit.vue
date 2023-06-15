@@ -7,7 +7,31 @@
       @drop.prevent="imageHandlerDrag"
     >
       <q-input v-model="nameCard" label="name"></q-input>
-      <q-toggle v-model="loopBool" left-label label="Loop?"></q-toggle>
+      <div class="row items-center q-my-sm">
+        <q-toggle v-model="loopBool" left-label label="Loop?"></q-toggle>
+        <span class="q-mr-xs">Fade in</span>
+        <q-input
+          v-model="fadeInRef"
+          filled
+          mask="##"
+          maxlength="2"
+          style="width: 11%"
+          class="q-pa-none q-mr-sm"
+          dense
+          borderless
+        ></q-input>
+        <span class="q-mr-xs">Fade out</span>
+        <q-input
+          v-model="fadeOutRef"
+          filled
+          mask="##"
+          maxlength="2"
+          style="width: 11%"
+          class="q-pa-none"
+          dense
+          borderless
+        ></q-input>
+      </div>
 
       <q-img
         @click="upImage"
@@ -49,6 +73,8 @@ export default defineComponent({
     loop: Boolean,
     name: String,
     img: File,
+    fadeOut: Number,
+    fadeIn: Number,
   },
 
   emits: [
@@ -74,7 +100,8 @@ export default defineComponent({
     }
     const loopBool = ref(props.loop);
     const nameCard = ref(props.name);
-
+    const fadeInRef = ref<number | undefined>(props.fadeIn);
+    const fadeOutRef = ref<number | undefined>(props.fadeOut);
     const file = ref<File>();
 
     const upImage = () => {
@@ -95,6 +122,8 @@ export default defineComponent({
       loopBool,
       uploader,
       nameCard,
+      fadeInRef,
+      fadeOutRef,
 
       url,
       upImage,
@@ -115,6 +144,8 @@ export default defineComponent({
           loop: loopBool.value,
           title: nameCard.value,
           img: file.value || props.img,
+          fadeIn: Number(fadeInRef.value),
+          fadeOut: Number(fadeOutRef.value),
         });
         // or with payload: onDialogOK({ ... })
         // ...and it will also hide the dialog automatically

@@ -15,6 +15,8 @@
             :_id="element._id"
             :img="element.img"
             :loop="element.loop"
+            :fadeIn="element.fadeIn"
+            :fadeOut="element.fadeOut"
           >
           </MusicCard>
         </div>

@@ -71,6 +71,8 @@ const Props = defineProps({
   _id: String,
   img: File,
   loop: Boolean,
+  fadeOut: Number,
+  fadeIn: Number,
 });
 
 const props = ref(Props);
@@ -95,6 +97,8 @@ const dialogEditCard = () => {
       name: Props.title,
       loop: Props.loop,
       img: Props.img,
+      fadeOut: Props.fadeOut,
+      fadeIn: Props.fadeIn,
     },
   }).onOk(async (element) => {
     console.log(element);
