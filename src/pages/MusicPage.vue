@@ -52,6 +52,8 @@ export default {
           file: file.value[value],
           order: value,
           loop: true,
+          fadeIn: 0,
+          fadeOut: 0,
         });
       }
       renderMusic.value += 1;

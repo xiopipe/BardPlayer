@@ -15,6 +15,8 @@
             :_id="element._id"
             :img="element.img"
             :loop="element.loop"
+            :fadeIn="element.fadeIn"
+            :fadeOut="element.fadeOut"
           >
           </MusicCard>
         </div>
@@ -24,6 +26,10 @@
 </template>
 
 <style lang="scss">
+.darkent {
+  background-repeat: no-repeat;
+  background-size: cover;
+}
 .ghost {
   opacity: 0.3;
   background: $accent;

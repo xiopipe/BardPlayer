@@ -8,6 +8,8 @@ export interface ISongs {
   img?: File | Blob;
   order?: number;
   loop?: boolean;
+  fadeIn?: number;
+  fadeOut?: number;
 }
 
 export default class Songs {
@@ -21,4 +23,6 @@ export default class Songs {
   public img?: File | Blob;
   public order?: number;
   public loop?: boolean;
+  public fadeIn?: number;
+  public fadeOut?: number;
 }
