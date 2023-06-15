@@ -26,6 +26,10 @@
 </template>
 
 <style lang="scss">
+.darkent {
+  background-repeat: no-repeat;
+  background-size: cover;
+}
 .ghost {
   opacity: 0.3;
   background: $accent;

@@ -1,6 +1,11 @@
 <template>
   <!-- notice dialogRef here -->
-  <q-dialog ref="dialogRef" @hide="onDialogHide" @keyup.enter="onOKClick">
+  <q-dialog
+    ref="dialogRef"
+    @hide="onDialogHide"
+    persistent
+    @keyup.enter="onOKClick"
+  >
     <q-card
       class="q-dialog-plugin q-pa-md"
       @dragover.prevent
@@ -72,9 +77,6 @@ export default defineComponent({
   props: {
     loop: Boolean,
     name: String,
-    img: File,
-    fadeOut: Number,
-    fadeIn: Number,
   },
 
   emits: [
@@ -95,13 +97,10 @@ export default defineComponent({
     // onDialogCancel - Function to call to settle dialog with "cancel" outcome
     const uploader = ref<HTMLElement>();
     const url = ref<string>();
-    if (!!props.img) {
-      url.value = URL.createObjectURL(props.img);
-    }
+
+    // info to upload
     const loopBool = ref(props.loop);
     const nameCard = ref(props.name);
-    const fadeInRef = ref<number | undefined>(props.fadeIn);
-    const fadeOutRef = ref<number | undefined>(props.fadeOut);
     const file = ref<File>();
 
     const upImage = () => {
@@ -122,8 +121,6 @@ export default defineComponent({
       loopBool,
       uploader,
       nameCard,
-      fadeInRef,
-      fadeOutRef,
 
       url,
       upImage,
@@ -143,9 +140,7 @@ export default defineComponent({
         onDialogOK({
           loop: loopBool.value,
           title: nameCard.value,
-          img: file.value || props.img,
-          fadeIn: Number(fadeInRef.value),
-          fadeOut: Number(fadeOutRef.value),
+          img: file.value,
         });
         // or with payload: onDialogOK({ ... })
         // ...and it will also hide the dialog automatically
